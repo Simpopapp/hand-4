@@ -94,7 +94,7 @@ function main(): void {
     rig.root.updateMatrixWorld(true);
     const inv = rig.holder.matrixWorld.clone().invert();
     const all: THREE.Vector3[] = [];
-    (w.glb.json.nodes ?? []).forEach((n: any, i: number) => {
+    (w.glb.json.nodes ?? []).forEach((n: { mesh?: number }, i: number) => {
       if (n.mesh === undefined) return;
       all.push(...verticesHolder(w.glb, w.tree, i, inv));
     });
@@ -171,7 +171,7 @@ function main(): void {
     rig.root.updateMatrixWorld(true);
     const inv = rig.holder.matrixWorld.clone().invert();
     const all: THREE.Vector3[] = [];
-    (w.glb.json.nodes ?? []).forEach((n: any, i: number) => {
+    (w.glb.json.nodes ?? []).forEach((n: { mesh?: number }, i: number) => {
       if (n.mesh === undefined) return;
       all.push(...verticesHolder(w.glb, w.tree, i, inv));
     });

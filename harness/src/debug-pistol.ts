@@ -115,7 +115,7 @@ console.log(
 }
 
 // onde os CORNOS do mesh caem no holder
-const meshIdx = (glb.json.nodes ?? []).findIndex((n: any) => n.mesh !== undefined);
+const meshIdx = (glb.json.nodes ?? []).findIndex((n: { mesh?: number }) => n.mesh !== undefined);
 const localBox = tree.meshBoxes.get(meshIdx)!;
 const holderInv2 = rig.holder.matrixWorld.clone().invert();
 for (const cx of [localBox.min.x, localBox.max.x])
@@ -133,7 +133,7 @@ for (const cx of [localBox.min.x, localBox.max.x])
 console.log(
   "\nnodes json:",
   JSON.stringify(
-    glb.json.nodes?.map((n: any, i: number) => ({
+    glb.json.nodes?.map((n: { mesh?: number }, i: number) => ({
       i,
       name: n.name,
       mesh: n.mesh,

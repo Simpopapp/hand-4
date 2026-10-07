@@ -131,7 +131,7 @@ function main(): void {
 
     // nomes: nós-mesh podem ser anônimos — usa o nome do pai / mesh
     console.log(`-- meshes em espaço do holder (nome | min | max | center) --`);
-    (wGlb.json.nodes ?? []).forEach((n: any, i: number) => {
+    (wGlb.json.nodes ?? []).forEach((n: { mesh?: number }, i: number) => {
       if (n.mesh === undefined) return;
       const localBox = wTree.meshBoxes
         .get(i)!
@@ -151,7 +151,7 @@ function main(): void {
     const anchor = new THREE.Vector3(...WEAPONS[weapon].armsHandR);
     const all: THREE.Vector3[] = [];
     const perNode = new Map<number, THREE.Vector3[]>();
-    (wGlb.json.nodes ?? []).forEach((n: any, i: number) => {
+    (wGlb.json.nodes ?? []).forEach((n: { mesh?: number }, i: number) => {
       if (n.mesh === undefined) return;
       const vs = nodeVerticesHolder(wGlb, wTree, i, holderInv);
       perNode.set(i, vs);

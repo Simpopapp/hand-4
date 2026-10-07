@@ -45,7 +45,7 @@ function verticesHolder(
 }
 
 /** nome do ancestral nomeado mais próximo (no JSON). */
-function ancestorName(nodes: any[], idx: number): string {
+function ancestorName(nodes: { children?: number[]; name?: string }[], idx: number): string {
   // reconstruir filhos
   const parentOf = new Map<number, number>();
   nodes.forEach((n, i) => (n.children ?? []).forEach((c: number) => parentOf.set(c, i)));
@@ -119,7 +119,7 @@ function main(): void {
     rig.root.updateMatrixWorld(true);
     const holderInv = rig.holder.matrixWorld.clone().invert();
     console.log(`\n================ ${weapon} ================`);
-    (w.glb.json.nodes ?? []).forEach((n: any, i: number) => {
+    (w.glb.json.nodes ?? []).forEach((n: { mesh?: number }, i: number) => {
       if (n.mesh === undefined) return;
       const vs = verticesHolder(w.glb, w.tree, i, holderInv);
       const nm = ancestorName(w.glb.json.nodes, i);
@@ -130,7 +130,7 @@ function main(): void {
     });
 
     const all: THREE.Vector3[] = [];
-    (w.glb.json.nodes ?? []).forEach((n: any, i: number) => {
+    (w.glb.json.nodes ?? []).forEach((n: { mesh?: number }, i: number) => {
       if (n.mesh === undefined) return;
       all.push(...verticesHolder(w.glb, w.tree, i, holderInv));
     });
