@@ -303,7 +303,7 @@ function cylinderCost(f: Frame, tips: Record<string, THREE.Vector3>, targets: Re
 function rTargets(f: Frame, wrapDir: 1 | -1): Record<string, THREE.Vector3> {
   const cfg =
     f.wrapRadius > 0.04 // rifle
-      ? { theta: [155, 135, 110, 75], t: [-0.02, -0.008, 0.002, 0.012], th: 20, tt: 0.018 }
+      ? { theta: [140, 120, 95, 68], t: [-0.02, -0.008, 0.002, 0.012], th: 20, tt: 0.018 }
       : { theta: [165, 140, 110, 60], t: [0.006, -0.002, -0.01, -0.02], th: -20, tt: 0.012 };
   const out: Record<string, THREE.Vector3> = {};
   (["f_index.03.R", "f_middle.03.R", "f_ring.03.R", "f_pinky.03.R"] as const).forEach((n, i) => {
@@ -349,9 +349,9 @@ function solveR(ev: ArmEval, f: Frame, wrapDir: 1 | -1) {
     const m = ev.metrics();
     let c = cylinderCost(f, m.tipsR, targets);
     const nu = m.palmNormalR.dot(f.u); // cross deve apontar AO eixo: nu ≤ −0.6
-    if (nu > -0.6) c += (nu + 0.6) ** 2 * 30;
+    if (nu > -0.63) c += (nu + 0.63) ** 2 * 30; // v3: margem sobre a regra (−0.6)
     const nz = Math.abs(m.palmNormalR.z);
-    if (nz > 0.75) c += (nz - 0.75) ** 2 * 120;
+    if (nz > 0.74) c += (nz - 0.74) ** 2 * 120; // v3: margem sobre a regra (0.75)
     c += limitPenalty(ev, deltas) + 0.02 * restPenalty(deltas);
     return c;
   };
@@ -360,7 +360,21 @@ function solveR(ev: ArmEval, f: Frame, wrapDir: 1 | -1) {
   descendReal(ev, deltas, ["hand.R", ...palmBones], cost, [0.25, 0.1, 0.04], 6);
   descendReal(ev, deltas, fingers.flat(), cost, [0.3, 0.15, 0.07, 0.03], 8);
   const best = descendReal(ev, deltas, allR, cost, [0.04, 0.015, 0.006], 6);
-  return { deltas, cost: best };
+  // v3: polimento — desida final só com as REGRAS do verificador (wrap, palma,
+  // limites), sem regularizador de descanso nem termo de superfície; empurra
+  // as pontas que ficaram 0,1–0,5 mm fora do raio de wrap.
+  const polishCost = (): number => {
+    const m = ev.metrics();
+    let c = cylinderCost(f, m.tipsR, targets, 0);
+    const nu = m.palmNormalR.dot(f.u);
+    if (nu > -0.63) c += (nu + 0.63) ** 2 * 200;
+    const nz = Math.abs(m.palmNormalR.z);
+    if (nz > 0.74) c += (nz - 0.74) ** 2 * 600;
+    c += limitPenalty(ev, deltas);
+    return c;
+  };
+  const polished = descendReal(ev, deltas, allR, polishCost, [0.02, 0.008, 0.003], 8);
+  return { deltas, cost: polished < best ? polished : best };
 }
 
 // ================= mão esquerda =================
