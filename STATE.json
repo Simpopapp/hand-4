@@ -1,7 +1,7 @@
 {
   "project": "PRD-PROJECT2 v4 — mãos FPS (M4A1 + Glock) para Three.js/TypeScript",
-  "updatedAt": "2026-10-07T04:29:57Z",
-  "phase": "M2",
+  "updatedAt": "2026-10-07T07:35:00Z",
+  "phase": "M3",
   "allGatesPassed": false,
   "phases": {
     "M0": {
@@ -15,8 +15,9 @@
       "notes": "verificador CLI (harness/src/verify.ts) + requirements.yaml (7 categorias) + 5 fixtures inválidas TODAS REPROVADAS com FAIL real (não só UNVERIFIED); paridade arma/braços contra tradução literal de VM:154-182/260-282 (11/11 testes); gates: vitest 12/12, lint OK, tsgo OK, build OK"
     },
     "M2": {
-      "status": "not_started",
-      "gates": null
+      "status": "done",
+      "gates": "PASS",
+      "notes": "poses em espaço R geradas por solver (grip.ts: geometria medida) e APROVADAS pelo verificador: pose_rifle e pose_pistol 18/18 PASS, 0 FAIL, 0 UNVERIFIED; sem primitivas (1 mesh original); skin 50 joints intacta; renames hand.R→handR/hand.L→handL declarados; gates globais: vitest 12/12, lint OK, tsgo OK. Obs: sessão anterior perdeu D6–D11 e o estado — reconstituído aqui a partir de requirements.yaml/solve.ts (ver D6–D9)."
     },
     "M3": {
       "status": "not_started",
@@ -61,13 +62,45 @@
       "date": "2026-10-07",
       "decision": "comparação de quaternions componente a componente (max |Δ|), não angleTo: quaternions do rig não são perfeitamente normalizados e angleTo(x,x) ≈ 5e-4 rad gera falso positivo em rest_identity.",
       "impact": "Regras rest_identity/root_identity imunes a ruído de normalização."
+    },
+    {
+      "id": "D6",
+      "date": "2026-10-07",
+      "decision": "Medir antes de posar (M2): grips medidos por SDF/vertices (harness/src/measure2.ts, measure3.ts, grip.ts) → gripGeometry em requirements.yaml (rifle: eixo [0.121,-0.867,0.484], raio 0.0302; pistola: eixo [-0.078,-0.997,-0.025], raio 0.0187). Nenhuma pose por correção no olho.",
+      "impact": "Regras visuais ancoradas em geometria medida, não em proxies."
+    },
+    {
+      "id": "D7",
+      "date": "2026-10-07",
+      "decision": "Emenda da regra de wrap (registrada no cabeçalho de requirements.yaml): distância PERPENDICULAR das pontas ao EIXO do grip dentro da extensão, em vez de raio ao redor da âncora do punho (pistola: vértice mais próximo a 0.048m da âncora tornava o proxy insatisfazível).",
+      "impact": "fingers_wrap_grip verifica wrap físico real; fixtures antigas continuam reprovadas."
+    },
+    {
+      "id": "D8",
+      "date": "2026-10-07",
+      "decision": "Solver v2 (espaço R): init analítica do frame da mão a partir da geometria medida (convenções provadas por convention-test.ts: R cross=+Z_local/flexão+X, L espelhado); alvos na SUPERFÍCIE do cilindro; wrapDir testado em ambos os sentidos; regularizador de descanso 0.02 + barreira soft de limites.",
+      "impact": "Causas-raiz da v1 (wRest alto, sem init, alvos em esfera) eliminadas."
+    },
+    {
+      "id": "D9",
+      "date": "2026-10-07",
+      "decision": "Solver v3 (fecha M2): dois FAILs residuais do verificador atacados por causa-raiz — (1) joint_limits: projeção DURA nos limites com margem 0,5° em setDeltas (barreira soft deixava juntas no limiar exato e o ruído empurrava 0,1–0,2° além); (2) fingers_wrap_grip: peso da regra dura 400→4000, polimento final só com regras do verificador (sem descanso/superfície) e margens de palma (nu≤−0.63, |n.z|≤0.74) sobre os tetos da regra (−0.6/0.75); alvos do rifle em arco alcançável (theta 140/120/95/68).",
+      "impact": "pose_rifle e pose_pistol 18/18 PASS com folga real nas regras duras."
     }
   ],
   "artifacts": {
     "asset_inventory.json": "M0",
     "contract.json": "M0",
     "STATE.json": "M0",
-    "NOTES.md": "M0"
+    "NOTES.md": "M0",
+    "requirements.yaml": "M1+emenda M2",
+    "harness/src/verify.ts": "M1",
+    "harness/src/grip.ts": "M2",
+    "harness/src/solve.ts": "M2 (v3)",
+    "poses/pose_rifle.json": "M2",
+    "poses/pose_pistol.json": "M2",
+    "docs/planning/reports/m2-verify-rifle.json": "M2",
+    "docs/planning/reports/m2-verify-pistol.json": "M2"
   },
   "unverified": []
 }

@@ -18,10 +18,10 @@ Gates de verificação por etapa (project1.md): tipagem de entrada · validaçã
 - [x] REPROVAR as poses experimentais anteriores pelo verificador — sem pacote anterior em disco (D3), as 5 fixtures representam os defeitos documentados e TODAS falham com FAIL real (rest_pose 1 FAIL; no_renames 3; crossed 3 — forearm_separation 0.0067m<0.012m; schema/extra_fields rejeição de entrada)
 - Gates M1: verificador independente do solver ✓ (regras próprias, sem solver); poses antigas = FAIL ✓; paridade harness/jogo comprovada ✓ (tradução literal VM:154-182/260-282). Gates globais: vitest 12/12, lint OK, tsgo OK, build OK.
 
-## M2 — Geração de poses em espaço R (GLB cru da arma)
-- [ ] Medir antes de posar (SDF/ancoras medidas, sem correção no olho)
-- [ ] Solver autorando em espaço R; attach à `model` (não ao holder)
-- Gates M2: toda pose nova PASS no verificador; sem primitivas; skin/pesos do viewmodel_arms.glb preservados.
+## M2 — Geração de poses em espaço R (GLB cru da arma) (CONCLUÍDA — Gates PASS)
+- [x] Medir antes de posar (SDF/ancoras medidas, sem correção no olho) — grip.ts/gripGeometry (D6)
+- [x] Solver autorando em espaço R; attach à `model` (não ao holder) — solver v3, poses/pose_{rifle,pistol}.json (D8/D9)
+- Gates M2: PASS — toda pose nova PASS no verificador (rifle e pistola 18/18, 0 UNVERIFIED); sem primitivas; skin/pesos do viewmodel_arms.glb preservados (50 joints, 1 mesh); vitest 12/12, lint OK, tsgo OK.
 
 ## M3 — Conversão/integração (Anexo B) + bakes
 - [ ] Converter/validar attach H↔R; gerar bakes (`viewmodel_arms_pose_rifle.glb` / `_pistol.glb`)
