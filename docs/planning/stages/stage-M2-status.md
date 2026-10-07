@@ -25,6 +25,12 @@
 - Saída do verificador (JSON): `docs/planning/reports/m2-verify-rifle.json`, `docs/planning/reports/m2-verify-pistol.json`
 - Decisões: STATE.json D6–D9 (reconstituídas após limpeza do ambiente; ver nota em NOTES.md)
 
+## Pós-avaliação do monitor (mesma data)
+
+- Discrepância nº 1 do relatório resolvida: `npm run lint` agora sem erros (formatação via `eslint --fix` + tipagem explícita no lugar de `any` em harness/src/{debug-pistol,diag-controls,measure,measure2,measure3}.ts). Restam 6 warnings preexistentes de `react-refresh` em `src/` (não erros).
+- Rótulo v2→v3 corrigido no cabeçalho de `solve.ts` e nas strings `source`/`notes` dos pacotes; poses regeneradas e re-verificadas: 18/18 PASS ambas.
+- Margem fina monitorada para M3 (re-verificar bakes após quantização GLB): rifle |n.z|=0.74 (teto 0.75); pistola dot=−0.63 (piso −0.6).
+
 ## Próximo passo
 
 - M3 — conversão/integração (Anexo B): attach H↔R, bakes `viewmodel_arms_pose_rifle.glb` / `_pistol.glb` em `public/game-assets/models/`, skinning autoritativo = three.js.
