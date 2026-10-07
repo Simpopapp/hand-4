@@ -35,22 +35,26 @@ function HomePage() {
     {
       icon: <Layers className="size-5 text-primary" />,
       title: "TanStack Start & React 19",
-      description: "Roteamento baseado em arquivos em src/routes/ e SSR nativo de alta performance.",
+      description:
+        "Roteamento baseado em arquivos em src/routes/ e SSR nativo de alta performance.",
     },
     {
       icon: <Palette className="size-5 text-primary" />,
       title: "Tailwind CSS v4 & Radix UI",
-      description: "Biblioteca completa de componentes em src/components/ui/ com tokens modernos em OKLCH.",
+      description:
+        "Biblioteca completa de componentes em src/components/ui/ com tokens modernos em OKLCH.",
     },
     {
       icon: <Cpu className="size-5 text-primary" />,
       title: "Runtime Agêntico & OpenCode",
-      description: "Proxy configurado na rota /oc para integração contínua e suporte do agente em background.",
+      description:
+        "Proxy configurado na rota /oc para integração contínua e suporte do agente em background.",
     },
     {
       icon: <Terminal className="size-5 text-primary" />,
       title: "Tooling & Automação",
-      description: "Ambiente pronto para Vite, Vitest, TypeScript estrito e ESLint sem resíduos legados.",
+      description:
+        "Ambiente pronto para Vite, Vitest, TypeScript estrito e ESLint sem resíduos legados.",
     },
   ];
 
@@ -70,13 +74,14 @@ function HomePage() {
             <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-primary">
               <Code2 className="size-4" />
             </div>
-            <span className="font-semibold text-sm tracking-tight text-foreground">
-              Workspace
-            </span>
+            <span className="font-semibold text-sm tracking-tight text-foreground">Workspace</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 text-xs font-normal">
+            <Badge
+              variant="outline"
+              className="border-primary/30 text-primary bg-primary/5 text-xs font-normal"
+            >
               <span className="mr-1.5 size-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
               Ambiente Pronto
             </Badge>
@@ -98,14 +103,19 @@ function HomePage() {
           </h1>
 
           <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-            Todo o conteúdo anterior foi removido. O ambiente de desenvolvimento, tooling, bibliotecas e componentes visuais estão intactos para você começar a construir sua aplicação.
+            Todo o conteúdo anterior foi removido. O ambiente de desenvolvimento, tooling,
+            bibliotecas e componentes visuais estão intactos para você começar a construir sua
+            aplicação.
           </p>
         </section>
 
         {/* Stack Grid */}
         <section className="grid gap-4 sm:grid-cols-2 mb-10">
           {stack.map((item, index) => (
-            <Card key={index} className="border-border/60 bg-card/60 backdrop-blur-xs transition-colors hover:border-primary/30">
+            <Card
+              key={index}
+              className="border-border/60 bg-card/60 backdrop-blur-xs transition-colors hover:border-primary/30"
+            >
               <CardHeader className="p-5 pb-2">
                 <div className="flex items-center gap-3">
                   <div className="flex size-9 items-center justify-center rounded-md bg-secondary/80 border border-border/40">
@@ -130,7 +140,10 @@ function HomePage() {
 
           <ul className="space-y-3">
             {steps.map((step, idx) => (
-              <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-muted-foreground">
+              <li
+                key={idx}
+                className="flex items-start gap-3 text-xs sm:text-sm text-muted-foreground"
+              >
                 <CheckCircle2 className="size-4 text-primary/70 shrink-0 mt-0.5" />
                 <span>{step}</span>
               </li>

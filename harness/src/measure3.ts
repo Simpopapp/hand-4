@@ -15,11 +15,18 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 
 function loadGlb(p: string): { glb: GlbData; tree: BuiltTree } {
   const buf = fs.readFileSync(p);
-  const glb = parseGlb(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer);
+  const glb = parseGlb(
+    buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer,
+  );
   return { glb, tree: buildNodeTree(glb) };
 }
 
-function verticesHolder(g: GlbData, tree: BuiltTree, i: number, holderInv: THREE.Matrix4): THREE.Vector3[] {
+function verticesHolder(
+  g: GlbData,
+  tree: BuiltTree,
+  i: number,
+  holderInv: THREE.Matrix4,
+): THREE.Vector3[] {
   const n = g.json.nodes[i];
   const out: THREE.Vector3[] = [];
   const v = new THREE.Vector3();
@@ -54,9 +61,11 @@ function pca(points: THREE.Vector3[]) {
       for (let q = p + 1; q < 3; q++) {
         if (Math.abs(A[p][q]) < 1e-14) continue;
         const t = 0.5 * Math.atan2(2 * A[p][q], A[q][q] - A[p][p]);
-        const cs = Math.cos(t), sn = Math.sin(t);
+        const cs = Math.cos(t),
+          sn = Math.sin(t);
         for (let k = 0; k < 3; k++) {
-          const kp = A[k][p], kq = A[k][q];
+          const kp = A[k][p],
+            kq = A[k][q];
           A[k][p] = cs * kp - sn * kq;
           A[k][q] = sn * kp + cs * kq;
         }
@@ -85,7 +94,7 @@ function main(): void {
     rig.root.updateMatrixWorld(true);
     const inv = rig.holder.matrixWorld.clone().invert();
     const all: THREE.Vector3[] = [];
-    (w.glb.json.nodes ?? []).forEach((n: any, i: number) => {
+    (w.glb.json.nodes ?? []).forEach((n: { mesh?: number }, i: number) => {
       if (n.mesh === undefined) return;
       all.push(...verticesHolder(w.glb, w.tree, i, inv));
     });
@@ -97,8 +106,12 @@ function main(): void {
       const gz = Math.round(v.z * 100);
       grid.set(`y=${gy},z=${gz}`, (grid.get(`y=${gy},z=${gz}`) ?? 0) + 1);
     }
-    const ys = [...new Set([...grid.keys()].map((k) => Number(k.split(",")[0].slice(2))))].sort((a, b) => a - b);
-    const zs = [...new Set([...grid.keys()].map((k) => Number(k.split(",")[1].slice(2))))].sort((a, b) => a - b);
+    const ys = [...new Set([...grid.keys()].map((k) => Number(k.split(",")[0].slice(2))))].sort(
+      (a, b) => a - b,
+    );
+    const zs = [...new Set([...grid.keys()].map((k) => Number(k.split(",")[1].slice(2))))].sort(
+      (a, b) => a - b,
+    );
     console.log("z cols: " + zs.join(","));
     for (const y of ys) {
       let line = `y=${String(y).padStart(3)}: `;
@@ -112,7 +125,9 @@ function main(): void {
     const core = grip.filter((v) => v.y < -0.02);
     const { center, axes, lambdas } = pca(core);
     console.log(`grip core (y<−0.02): ${core.length}v centro=${fmt(center)}`);
-    axes.forEach((a, i) => console.log(`  eixo[${i}] λ=${lambdas[i].toExponential(2)} dir=${fmt(a, 3)}`));
+    axes.forEach((a, i) =>
+      console.log(`  eixo[${i}] λ=${lambdas[i].toExponential(2)} dir=${fmt(a, 3)}`),
+    );
     // secção: raio perpendicular ao eixo0
     const rr: number[] = [];
     for (const v of core) {
@@ -121,7 +136,9 @@ function main(): void {
       rr.push(d.length());
     }
     rr.sort((a, b) => a - b);
-    console.log(`raio perp ao eixo: p10=${rr[Math.floor(rr.length * 0.1)].toFixed(4)} p50=${rr[Math.floor(rr.length * 0.5)].toFixed(4)} p90=${rr[Math.floor(rr.length * 0.9)].toFixed(4)}`);
+    console.log(
+      `raio perp ao eixo: p10=${rr[Math.floor(rr.length * 0.1)].toFixed(4)} p50=${rr[Math.floor(rr.length * 0.5)].toFixed(4)} p90=${rr[Math.floor(rr.length * 0.9)].toFixed(4)}`,
+    );
     // mapa x×z do grip core
     const grid2 = new Map<string, number>();
     for (const v of core) {
@@ -129,8 +146,12 @@ function main(): void {
       const gz = Math.round(v.z * 200);
       grid2.set(`x=${gx},z=${gz}`, (grid2.get(`x=${gx},z=${gz}`) ?? 0) + 1);
     }
-    const xs = [...new Set([...grid2.keys()].map((k) => Number(k.split(",")[0].slice(2))))].sort((a, b) => a - b);
-    const zs2 = [...new Set([...grid2.keys()].map((k) => Number(k.split(",")[1].slice(2))))].sort((a, b) => a - b);
+    const xs = [...new Set([...grid2.keys()].map((k) => Number(k.split(",")[0].slice(2))))].sort(
+      (a, b) => a - b,
+    );
+    const zs2 = [...new Set([...grid2.keys()].map((k) => Number(k.split(",")[1].slice(2))))].sort(
+      (a, b) => a - b,
+    );
     console.log("secção x×z (linhas x, colunas z×0.005): cols=" + zs2.join(","));
     for (const x of xs) {
       let line = `x=${String(x).padStart(4)}: `;
@@ -150,7 +171,7 @@ function main(): void {
     rig.root.updateMatrixWorld(true);
     const inv = rig.holder.matrixWorld.clone().invert();
     const all: THREE.Vector3[] = [];
-    (w.glb.json.nodes ?? []).forEach((n: any, i: number) => {
+    (w.glb.json.nodes ?? []).forEach((n: { mesh?: number }, i: number) => {
       if (n.mesh === undefined) return;
       all.push(...verticesHolder(w.glb, w.tree, i, inv));
     });
@@ -159,13 +180,16 @@ function main(): void {
     const { center, axes, lambdas } = pca(grip);
     console.log(`centro=${fmt(center)}`);
     axes.forEach((a, i) => {
-      let tmin = Infinity, tmax = -Infinity;
+      let tmin = Infinity,
+        tmax = -Infinity;
       for (const v of grip) {
         const t = v.clone().sub(center).dot(a);
         if (t < tmin) tmin = t;
         if (t > tmax) tmax = t;
       }
-      console.log(`  eixo[${i}] λ=${lambdas[i].toExponential(2)} dir=${fmt(a, 3)} ext=[${tmin.toFixed(4)},${tmax.toFixed(4)}]`);
+      console.log(
+        `  eixo[${i}] λ=${lambdas[i].toExponential(2)} dir=${fmt(a, 3)} ext=[${tmin.toFixed(4)},${tmax.toFixed(4)}]`,
+      );
     });
     const rr: number[] = [];
     for (const v of grip) {
@@ -174,7 +198,9 @@ function main(): void {
       rr.push(d.length());
     }
     rr.sort((a, b) => a - b);
-    console.log(`raio perp: p10=${rr[Math.floor(rr.length * 0.1)].toFixed(4)} p50=${rr[Math.floor(rr.length * 0.5)].toFixed(4)} p90=${rr[Math.floor(rr.length * 0.9)].toFixed(4)}`);
+    console.log(
+      `raio perp: p10=${rr[Math.floor(rr.length * 0.1)].toFixed(4)} p50=${rr[Math.floor(rr.length * 0.5)].toFixed(4)} p90=${rr[Math.floor(rr.length * 0.9)].toFixed(4)}`,
+    );
     const box = new THREE.Box3().setFromPoints(grip);
     console.log(`bbox grip: min${fmt(box.min)} max${fmt(box.max)}`);
     // mapa x×y (secção)
@@ -184,8 +210,12 @@ function main(): void {
       const gy = Math.round(v.y * 100);
       grid3.set(`x=${gx},y=${gy}`, (grid3.get(`x=${gx},y=${gy}`) ?? 0) + 1);
     }
-    const xs3 = [...new Set([...grid3.keys()].map((k) => Number(k.split(",")[0].slice(2))))].sort((a, b) => a - b);
-    const ys3 = [...new Set([...grid3.keys()].map((k) => Number(k.split(",")[1].slice(2))))].sort((a, b) => a - b);
+    const xs3 = [...new Set([...grid3.keys()].map((k) => Number(k.split(",")[0].slice(2))))].sort(
+      (a, b) => a - b,
+    );
+    const ys3 = [...new Set([...grid3.keys()].map((k) => Number(k.split(",")[1].slice(2))))].sort(
+      (a, b) => a - b,
+    );
     console.log("secção x×y (×0.01): cols x=" + xs3.join(","));
     for (const y of ys3) {
       let line = `y=${String(y).padStart(3)}: `;
@@ -214,16 +244,34 @@ function main(): void {
     const inv = rig.holder.matrixWorld.clone().invert();
     console.log(`\nPISTOL braços (descanso, XYZ):`);
     for (const nm of [
-      "clavicle.R", "deltoid.R", "upper_arm.R", "forearm.R", "handR",
-      "palm_index.R", "palm_pinky.R", "f_index.01.R", "f_middle.01.R", "f_pinky.01.R", "thumb.01.R",
-      "clavicle.L", "deltoid.L", "upper_arm.L", "forearm.L", "handL", "palm_index.L",
+      "clavicle.R",
+      "deltoid.R",
+      "upper_arm.R",
+      "forearm.R",
+      "handR",
+      "palm_index.R",
+      "palm_pinky.R",
+      "f_index.01.R",
+      "f_middle.01.R",
+      "f_pinky.01.R",
+      "thumb.01.R",
+      "clavicle.L",
+      "deltoid.L",
+      "upper_arm.L",
+      "forearm.L",
+      "handL",
+      "palm_index.L",
     ]) {
       const b = arms.tree.byName.get(nm);
-      if (!b) { console.log(`${nm.padEnd(14)} AUSENTE`); continue; }
+      if (!b) {
+        console.log(`${nm.padEnd(14)} AUSENTE`);
+        continue;
+      }
       const p = b.getWorldPosition(new THREE.Vector3()).applyMatrix4(inv);
       console.log(`${nm.padEnd(14)} ${fmt(p)}`);
     }
-    const fl = arms.tree.byName.get("forearm.L")!, fr = arms.tree.byName.get("forearm.R")!;
+    const fl = arms.tree.byName.get("forearm.L")!,
+      fr = arms.tree.byName.get("forearm.R")!;
     const a0 = fl.getWorldPosition(new THREE.Vector3()).applyMatrix4(inv);
     const a1 = fl.children[0].getWorldPosition(new THREE.Vector3()).applyMatrix4(inv);
     const b0 = fr.getWorldPosition(new THREE.Vector3()).applyMatrix4(inv);

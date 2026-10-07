@@ -17,11 +17,18 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 
 function loadGlb(p: string): { glb: GlbData; tree: BuiltTree } {
   const buf = fs.readFileSync(p);
-  const glb = parseGlb(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer);
+  const glb = parseGlb(
+    buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer,
+  );
   return { glb, tree: buildNodeTree(glb) };
 }
 
-function verticesHolder(g: GlbData, tree: BuiltTree, i: number, holderInv: THREE.Matrix4): THREE.Vector3[] {
+function verticesHolder(
+  g: GlbData,
+  tree: BuiltTree,
+  i: number,
+  holderInv: THREE.Matrix4,
+): THREE.Vector3[] {
   const n = g.json.nodes[i];
   const out: THREE.Vector3[] = [];
   const v = new THREE.Vector3();
@@ -38,7 +45,7 @@ function verticesHolder(g: GlbData, tree: BuiltTree, i: number, holderInv: THREE
 }
 
 /** nome do ancestral nomeado mais próximo (no JSON). */
-function ancestorName(nodes: any[], idx: number): string {
+function ancestorName(nodes: { children?: number[]; name?: string }[], idx: number): string {
   // reconstruir filhos
   const parentOf = new Map<number, number>();
   nodes.forEach((n, i) => (n.children ?? []).forEach((c: number) => parentOf.set(c, i)));
@@ -71,9 +78,11 @@ function pca(points: THREE.Vector3[]) {
       for (let q = p + 1; q < 3; q++) {
         if (Math.abs(A[p][q]) < 1e-14) continue;
         const t = 0.5 * Math.atan2(2 * A[p][q], A[q][q] - A[p][p]);
-        const cs = Math.cos(t), sn = Math.sin(t);
+        const cs = Math.cos(t),
+          sn = Math.sin(t);
         for (let k = 0; k < 3; k++) {
-          const kp = A[k][p], kq = A[k][q];
+          const kp = A[k][p],
+            kq = A[k][q];
           A[k][p] = cs * kp - sn * kq;
           A[k][q] = sn * kp + cs * kq;
         }
@@ -98,20 +107,30 @@ function main(): void {
   for (const weapon of ["rifle", "pistol"] as const) {
     const w = loadGlb(path.join(ROOT, `prd-proj1-assets/inputs/models/viewmodel_${weapon}.glb`));
     const rawBox = sceneBoundingBox(w.glb, w.tree);
-    const rig = buildFullRig(weapon, w.tree, buildNodeTree(loadGlb(path.join(ROOT, "prd-proj1-assets/inputs/models/viewmodel_arms.glb")).glb), REQUIRED_RENAMES, rawBox);
+    const rig = buildFullRig(
+      weapon,
+      w.tree,
+      buildNodeTree(
+        loadGlb(path.join(ROOT, "prd-proj1-assets/inputs/models/viewmodel_arms.glb")).glb,
+      ),
+      REQUIRED_RENAMES,
+      rawBox,
+    );
     rig.root.updateMatrixWorld(true);
     const holderInv = rig.holder.matrixWorld.clone().invert();
     console.log(`\n================ ${weapon} ================`);
-    (w.glb.json.nodes ?? []).forEach((n: any, i: number) => {
+    (w.glb.json.nodes ?? []).forEach((n: { mesh?: number }, i: number) => {
       if (n.mesh === undefined) return;
       const vs = verticesHolder(w.glb, w.tree, i, holderInv);
       const nm = ancestorName(w.glb.json.nodes, i);
       const box = new THREE.Box3().setFromPoints(vs);
-      console.log(`mesh do nó ${i} [${nm}] ${vs.length}v bbox min${fmt(box.min)} max${fmt(box.max)}`);
+      console.log(
+        `mesh do nó ${i} [${nm}] ${vs.length}v bbox min${fmt(box.min)} max${fmt(box.max)}`,
+      );
     });
 
     const all: THREE.Vector3[] = [];
-    (w.glb.json.nodes ?? []).forEach((n: any, i: number) => {
+    (w.glb.json.nodes ?? []).forEach((n: { mesh?: number }, i: number) => {
       if (n.mesh === undefined) return;
       all.push(...verticesHolder(w.glb, w.tree, i, holderInv));
     });
@@ -126,8 +145,12 @@ function main(): void {
         const k = `y=${gy},z=${gz}`;
         grid.set(k, (grid.get(k) ?? 0) + 1);
       }
-      const ys = [...new Set([...grid.keys()].map((k) => Number(k.split(",")[0].slice(2))))].sort((a, b) => a - b);
-      const zs = [...new Set([...grid.keys()].map((k) => Number(k.split(",")[1].slice(2))))].sort((a, b) => a - b);
+      const ys = [...new Set([...grid.keys()].map((k) => Number(k.split(",")[0].slice(2))))].sort(
+        (a, b) => a - b,
+      );
+      const zs = [...new Set([...grid.keys()].map((k) => Number(k.split(",")[1].slice(2))))].sort(
+        (a, b) => a - b,
+      );
       console.log("\nmapa pistol y(linhas) × z(colunas), contagem:");
       for (const y of ys) {
         let line = `y=${String(y).padStart(3)}: `;
@@ -151,8 +174,12 @@ function main(): void {
         const k = `x=${gx},y=${gy}`;
         grid.set(k, (grid.get(k) ?? 0) + 1);
       }
-      const xs = [...new Set([...grid.keys()].map((k) => Number(k.split(",")[0].slice(2))))].sort((a, b) => a - b);
-      const ys2 = [...new Set([...grid.keys()].map((k) => Number(k.split(",")[1].slice(2))))].sort((a, b) => a - b);
+      const xs = [...new Set([...grid.keys()].map((k) => Number(k.split(",")[0].slice(2))))].sort(
+        (a, b) => a - b,
+      );
+      const ys2 = [...new Set([...grid.keys()].map((k) => Number(k.split(",")[1].slice(2))))].sort(
+        (a, b) => a - b,
+      );
       for (const y of ys2) {
         let line = `y=${String(y).padStart(4)}: `;
         for (const x of xs) {
@@ -163,10 +190,17 @@ function main(): void {
       }
       console.log("colunas x (×0.005): " + xs.join(","));
       const { center, axes, lambdas } = pca(grip);
-      console.log(`grip centro=${fmt(center)} eixo0=${fmt(axes[0], 3)} λ=${lambdas[0].toExponential(2)}`);
+      console.log(
+        `grip centro=${fmt(center)} eixo0=${fmt(axes[0], 3)} λ=${lambdas[0].toExponential(2)}`,
+      );
       // extensões
-      for (const [name, ax] of [["eixo0", axes[0]], ["eixo1", axes[1]], ["eixo2", axes[2]]] as const) {
-        let tmin = Infinity, tmax = -Infinity;
+      for (const [name, ax] of [
+        ["eixo0", axes[0]],
+        ["eixo1", axes[1]],
+        ["eixo2", axes[2]],
+      ] as const) {
+        let tmin = Infinity,
+          tmax = -Infinity;
         for (const v of grip) {
           const t = v.clone().sub(center).dot(ax);
           if (t < tmin) tmin = t;
@@ -179,8 +213,11 @@ function main(): void {
       const front = all.filter((v) => v.z < 0.0 && v.z > -0.25 && v.y > -0.02 && v.y < 0.14);
       const { center: fc, axes: fa, lambdas: fl } = pca(front);
       console.log(`\nhandguard região (z −0.25..0, y −0.02..0.14): ${front.length} vértices`);
-      console.log(`centro=${fmt(fc)} eixo0=${fmt(fa[0], 3)} λ=${fl[0].toExponential(2)} eixo1=${fmt(fa[1], 3)}`);
-      let tmin = Infinity, tmax = -Infinity;
+      console.log(
+        `centro=${fmt(fc)} eixo0=${fmt(fa[0], 3)} λ=${fl[0].toExponential(2)} eixo1=${fmt(fa[1], 3)}`,
+      );
+      let tmin = Infinity,
+        tmax = -Infinity;
       for (const v of front) {
         const t = v.clone().sub(fc).dot(fa[0]);
         if (t < tmin) tmin = t;
@@ -195,7 +232,9 @@ function main(): void {
         rr.push(d.length());
       }
       rr.sort((a, b) => a - b);
-      console.log(`raio perp: p10=${rr[Math.floor(rr.length * 0.1)].toFixed(4)} p50=${rr[Math.floor(rr.length * 0.5)].toFixed(4)} p90=${rr[Math.floor(rr.length * 0.9)].toFixed(4)}`);
+      console.log(
+        `raio perp: p10=${rr[Math.floor(rr.length * 0.1)].toFixed(4)} p50=${rr[Math.floor(rr.length * 0.5)].toFixed(4)} p90=${rr[Math.floor(rr.length * 0.9)].toFixed(4)}`,
+      );
     }
 
     // âncora vs geometria: fatia de vértices mais próxima da âncora
