@@ -1,5 +1,5 @@
 /**
- * M2 — solver de poses em espaço R (GLB cru da arma), attach à model. v2.
+ * M2 — solver de poses em espaço R (GLB cru da arma), attach à model. v3.
  *
  * Causas-raiz da v1 (provadas por diagnóstico, ver STATE.json D8-D11):
  *  1. wRest=0.4 tornava o curl necessário (~7 rad somados) MAIS CARO que o
