@@ -22,3 +22,10 @@
 - Paridade: buildWeaponRig/buildFullRig/attachArms vs tradução literal de VM:154-182 e VM:260-282 — 11/11.
 - Correções de causa raiz nesta fase: (1) center por união per-mesh × matrixWorld (setFromObject do jogo); (2) comparação de quaternion componente a componente (rig não normalizado → angleTo falso positivo); (3) ROOT portável bun/node (fileURLToPath).
 - Próximo passo: M2 — medir âncoras (SDF) nos GLBs das armas e gerar poses em espaço R com solver, sem correção no olho.
+
+## M2 concluído (gates PASS)
+- Poses em espaço R geradas por `bun harness/src/solve.ts` (solver v3) e APROVADAS: `poses/pose_rifle.json` e `poses/pose_pistol.json` — verificador 18/18 PASS, 0 FAIL, 0 UNVERIFIED (relatórios em `docs/planning/reports/m2-verify-*.json`).
+- Geometria medida (measure2/measure3 → grip.ts → gripGeometry no requirements.yaml); regra de wrap = perpendicular ao eixo do grip (emenda D7).
+- v3 (causa-raiz dos 2 FAILs residuais): projeção dura de limites com margem 0,5°; peso da regra de wrap 400→4000; polimento final só com regras do verificador; margens de palma (nu≤−0.63, |n.z|≤0.74).
+- Nota de recuperação: o ambiente foi limpo entre sessões; o monitor OpenCode foi reinstalado (v1.18.35, porta 4096) e as decisions D6–D9 foram reconstituídas em STATE.json.
+- Próximo passo exato: **M3** — conversão/integração (Anexo B): attach H↔R, bakes `viewmodel_arms_pose_rifle.glb` / `_pistol.glb` em `public/game-assets/models/`, skinning autoritativo = three.js, bakes aprovados no verificador.
