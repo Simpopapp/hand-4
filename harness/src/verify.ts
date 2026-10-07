@@ -303,10 +303,7 @@ function rule(ctx: Ctx, id: string): RuleResult {
         const margin = ctx.reqs.visual.wrapAxisMargin;
         const bad = tips
           .map((t) => {
-            const d = ctx.armsPoed.byName
-              .get(t)!
-              .getWorldPosition(new THREE.Vector3())
-              .sub(center);
+            const d = ctx.armsPoed.byName.get(t)!.getWorldPosition(new THREE.Vector3()).sub(center);
             const tA = d.dot(axis);
             const perp = d.clone().addScaledVector(axis, -tA).length();
             return { t, perp, tA };
@@ -319,7 +316,10 @@ function rule(ctx: Ctx, id: string): RuleResult {
             `${bad.length}/${tips.length} pontas fora do grip: perp=${worst.perp.toFixed(3)}m (raio ${wrapR}), eixo t=${worst.tA.toFixed(3)}m (ext ±${(geo.halfExt + margin).toFixed(3)})`,
           );
         }
-        return make("PASS", `${tips.length} pontas de dedo no grip (perp ≤ ${wrapR}m, extensão ok)`);
+        return make(
+          "PASS",
+          `${tips.length} pontas de dedo no grip (perp ≤ ${wrapR}m, extensão ok)`,
+        );
       }
       case "forearm_separation": {
         if (!ctx.rig || !ctx.rig.attach.ok) return make("UNVERIFIED", "rig/attach indisponível");
@@ -369,8 +369,14 @@ function rule(ctx: Ctx, id: string): RuleResult {
         const radial = normal.dot(perp);
         const minR = ctx.reqs.visual.minPalmRadial;
         return radial > -minR
-          ? make("FAIL", `palma afastada do grip: dot(n,radial_âncora)=${radial.toFixed(2)} (esperado ≤ ${-minR})`)
-          : make("PASS", `palma contra o grip (dot=${radial.toFixed(2)}) e não encara a câmera (|n.z|=${facing.toFixed(2)})`);
+          ? make(
+              "FAIL",
+              `palma afastada do grip: dot(n,radial_âncora)=${radial.toFixed(2)} (esperado ≤ ${-minR})`,
+            )
+          : make(
+              "PASS",
+              `palma contra o grip (dot=${radial.toFixed(2)}) e não encara a câmera (|n.z|=${facing.toFixed(2)})`,
+            );
       }
       case "weapon_scale_formula": {
         if (!ctx.rig || !ctx.rawBox) return make("UNVERIFIED", "bbox da arma não medida");

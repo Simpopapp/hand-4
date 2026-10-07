@@ -32,7 +32,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { BuiltTree } from "./glb";
 import { parseGlb, buildNodeTree, sceneBoundingBox } from "./glb";
-import { WEAPONS, buildWeaponRig, attachArms, applyRenames, REQUIRED_RENAMES, type WeaponName } from "./normalize";
+import {
+  WEAPONS,
+  buildWeaponRig,
+  attachArms,
+  applyRenames,
+  REQUIRED_RENAMES,
+  type WeaponName,
+} from "./normalize";
 import { GRIP, HANDGUARD_RIFLE, type GripGeom } from "./grip";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -46,7 +53,9 @@ function loadGlb(p: string) {
 const armsGlb = loadGlb(ARMS_GLB);
 
 // ================= rigs estáticos por arma =================
-const rigCache: Partial<Record<WeaponName, { rig: ReturnType<typeof buildWeaponRig>; root: THREE.Group }>> = {};
+const rigCache: Partial<
+  Record<WeaponName, { rig: ReturnType<typeof buildWeaponRig>; root: THREE.Group }>
+> = {};
 function getRig(weapon: WeaponName) {
   if (!rigCache[weapon]) {
     const wGlb = loadGlb(path.join(ROOT, `prd-proj1-assets/inputs/models/viewmodel_${weapon}.glb`));
@@ -127,7 +136,9 @@ class ArmEval {
     const handR = H(this.tree.byName.get("handR")!);
     const piR = H(this.tree.byName.get("palm_index.R")!);
     const ppR = H(this.tree.byName.get("palm_pinky.R")!);
-    const palmNormalR = new THREE.Vector3().crossVectors(piR.clone().sub(handR), ppR.clone().sub(handR)).normalize();
+    const palmNormalR = new THREE.Vector3()
+      .crossVectors(piR.clone().sub(handR), ppR.clone().sub(handR))
+      .normalize();
     const handL = H(this.tree.byName.get("handL")!);
     const seg = (o: THREE.Object3D): [THREE.Vector3, THREE.Vector3] => {
       const p0 = H(o);
@@ -136,18 +147,32 @@ class ArmEval {
     const forearmL = seg(this.tree.byName.get("forearm.L")!);
     const forearmR = seg(this.tree.byName.get("forearm.R")!);
     return {
-      tipsR, tipsL, palmNormalR, handR, handL, forearmL, forearmR,
+      tipsR,
+      tipsL,
+      palmNormalR,
+      handR,
+      handL,
+      forearmL,
+      forearmR,
       foreGap: segSegDist(forearmL[0], forearmL[1], forearmR[0], forearmR[1]),
     };
   }
 }
 
-function segSegDist(p0: THREE.Vector3, p1: THREE.Vector3, q0: THREE.Vector3, q1: THREE.Vector3): number {
+function segSegDist(
+  p0: THREE.Vector3,
+  p1: THREE.Vector3,
+  q0: THREE.Vector3,
+  q1: THREE.Vector3,
+): number {
   const d1 = p1.clone().sub(p0);
   const d2 = q1.clone().sub(q0);
   const r = p0.clone().sub(q0);
-  const a = d1.dot(d1), e = d2.dot(d2), f = d2.dot(r);
-  let s = 0, t = 0;
+  const a = d1.dot(d1),
+    e = d2.dot(d2),
+    f = d2.dot(r);
+  let s = 0,
+    t = 0;
   if (a <= 1e-12 && e <= 1e-12) return r.length();
   if (a <= 1e-12) t = Math.min(Math.max(f / e, 0), 1);
   else {
@@ -158,8 +183,13 @@ function segSegDist(p0: THREE.Vector3, p1: THREE.Vector3, q0: THREE.Vector3, q1:
       const denom = a * e - b * b;
       s = denom > 1e-12 ? Math.min(Math.max((b * f - c * e) / denom, 0), 1) : 0;
       t = (b * s + f) / e;
-      if (t < 0) { t = 0; s = Math.min(Math.max(-c / a, 0), 1); }
-      else if (t > 1) { t = 1; s = Math.min(Math.max((b - c) / a, 0), 1); }
+      if (t < 0) {
+        t = 0;
+        s = Math.min(Math.max(-c / a, 0), 1);
+      } else if (t > 1) {
+        t = 1;
+        s = Math.min(Math.max((b - c) / a, 0), 1);
+      }
     }
   }
   return p0.clone().addScaledVector(d1, s).distanceTo(q0.clone().addScaledVector(d2, t));
@@ -169,8 +199,8 @@ function segSegDist(p0: THREE.Vector3, p1: THREE.Vector3, q0: THREE.Vector3, q1:
 interface Frame extends GripGeom {
   anchor: THREE.Vector3;
   axisPoint: THREE.Vector3; // ponto do eixo mais próximo da âncora (clampado)
-  u: THREE.Vector3;         // radial: do eixo para a âncora (lado da palma)
-  v: THREE.Vector3;         // axis × u
+  u: THREE.Vector3; // radial: do eixo para a âncora (lado da palma)
+  v: THREE.Vector3; // axis × u
 }
 function makeFrame(geom: GripGeom, anchor: THREE.Vector3): Frame {
   const axis = new THREE.Vector3(...geom.axis).normalize();
@@ -198,7 +228,11 @@ const CROSS_LOCAL = { R: new THREE.Vector3(0, 0, 1), L: new THREE.Vector3(0, 0, 
  * colY (dedos, +Y local) → tangente `fingerDir`; colZ (imagem local do CROSS)
  * → `crossTarget` (palma encostando no cilindro). colX = colY×colZ.
  */
-function handWorldQuat(fingerDir: THREE.Vector3, crossTarget: THREE.Vector3, crossLocalSign: number): THREE.Quaternion {
+function handWorldQuat(
+  fingerDir: THREE.Vector3,
+  crossTarget: THREE.Vector3,
+  crossLocalSign: number,
+): THREE.Quaternion {
   const y = fingerDir.clone().normalize();
   const z = crossTarget.clone().multiplyScalar(crossLocalSign).normalize();
   y.addScaledVector(z, -y.dot(z)).normalize(); // ortonormaliza
@@ -218,9 +252,14 @@ function eulerForWorldQuat(ev: ArmEval, bone: string, qWorldTarget: THREE.Quater
 
 // ================= limites / regularização =================
 const LIMITS: Array<[RegExp, number]> = [
-  [/^f_/, 100 * DEG], [/^thumb/, 90 * DEG], [/^forearm/, 140 * DEG],
-  [/^upper_arm/, 120 * DEG], [/^deltoid/, 60 * DEG], [/^clavicle/, 30 * DEG],
-  [/^palm_/, 45 * DEG], [/^hand\./, 90 * DEG],
+  [/^f_/, 100 * DEG],
+  [/^thumb/, 90 * DEG],
+  [/^forearm/, 140 * DEG],
+  [/^upper_arm/, 120 * DEG],
+  [/^deltoid/, 60 * DEG],
+  [/^clavicle/, 30 * DEG],
+  [/^palm_/, 45 * DEG],
+  [/^hand\./, 90 * DEG],
 ];
 function limitFor(bone: string): number {
   for (const [re, lim] of LIMITS) if (re.test(bone)) return lim;
@@ -252,8 +291,9 @@ function descendReal(
 ): number {
   ev.setDeltas(deltas);
   let best = cost();
-  if (!Number.isFinite(best)) console.log(`  [desc] custo inicial NaN! bones=${bones.slice(0,3).join(",")}...`);
-  let accepted = 0;
+  if (!Number.isFinite(best))
+    console.log(`  [desc] custo inicial NaN! bones=${bones.slice(0, 3).join(",")}...`);
+  const accepted = 0;
   for (const step of steps) {
     for (let sweep = 0; sweep < sweeps; sweep++) {
       let improved = false;
@@ -267,21 +307,33 @@ function descendReal(
             e[key] = old + dir * step;
             ev.setDeltas(deltas);
             const c = cost();
-            if (c < best - 1e-9) { best = c; improved = true; }
-            else { e[key] = old; ev.setDeltas(deltas); }
+            if (c < best - 1e-9) {
+              best = c;
+              improved = true;
+            } else {
+              e[key] = old;
+              ev.setDeltas(deltas);
+            }
           }
         }
       }
       if (!improved) break;
     }
   }
-  if (accepted > 0) console.log(`  [desc] ${bones.slice(0,2).join(",")}...: ${accepted} movimentos, best=${best.toFixed(4)}`);
+  if (accepted > 0)
+    console.log(
+      `  [desc] ${bones.slice(0, 2).join(",")}...: ${accepted} movimentos, best=${best.toFixed(4)}`,
+    );
   return best;
 }
 
-
 // ================= custos =================
-function cylinderCost(f: Frame, tips: Record<string, THREE.Vector3>, targets: Record<string, THREE.Vector3>, wSurf = 6): number {
+function cylinderCost(
+  f: Frame,
+  tips: Record<string, THREE.Vector3>,
+  targets: Record<string, THREE.Vector3>,
+  wSurf = 6,
+): number {
   let c = 0;
   for (const [n, tgt] of Object.entries(targets)) {
     const p = tips[n];
@@ -292,9 +344,9 @@ function cylinderCost(f: Frame, tips: Record<string, THREE.Vector3>, targets: Re
     // v3: peso da regra dura 400→4000 — na v2 o custo de furar o wrap
     // (≤0.05 por ponta) perdia para a barreira de limites e o regularizador
     // de descanso; o otimizador estacionava as pontas 1–11 mm fora do grip.
-    c += Math.max(0, perp - f.wrapRadius) ** 2 * 4000;          // regra: dentro do raio
+    c += Math.max(0, perp - f.wrapRadius) ** 2 * 4000; // regra: dentro do raio
     c += Math.max(0, Math.abs(tA) - (f.halfExt + 0.02)) ** 2 * 4000; // regra: dentro do grip
-    c += (perp - f.radius) ** 2 * wSurf;                        // visual: na superfície
+    c += (perp - f.radius) ** 2 * wSurf; // visual: na superfície
   }
   return c;
 }
@@ -307,7 +359,10 @@ function rTargets(f: Frame, wrapDir: 1 | -1): Record<string, THREE.Vector3> {
       : { theta: [165, 140, 110, 60], t: [0.006, -0.002, -0.01, -0.02], th: -20, tt: 0.012 };
   const out: Record<string, THREE.Vector3> = {};
   (["f_index.03.R", "f_middle.03.R", "f_ring.03.R", "f_pinky.03.R"] as const).forEach((n, i) => {
-    out[n] = f.center.clone().addScaledVector(f.axis, cfg.t[i]).addScaledVector(radial(f, cfg.theta[i] * DEG, wrapDir), f.radius);
+    out[n] = f.center
+      .clone()
+      .addScaledVector(f.axis, cfg.t[i])
+      .addScaledVector(radial(f, cfg.theta[i] * DEG, wrapDir), f.radius);
   });
   out["thumb.03.R"] = f.center
     .clone()
@@ -329,14 +384,23 @@ function solveR(ev: ArmEval, f: Frame, wrapDir: 1 | -1) {
   ];
   const deltas = new Map<string, THREE.Euler>();
   // inicialização analítica: orientação da mão a partir do frame medido
-  deltas.set("hand.R", eulerForWorldQuat(ev, "hand.R", handWorldQuat(f.axis, f.u.clone().negate(), 1)));
+  deltas.set(
+    "hand.R",
+    eulerForWorldQuat(ev, "hand.R", handWorldQuat(f.axis, f.u.clone().negate(), 1)),
+  );
   for (const b of palmBones) deltas.set(b, new THREE.Euler(0, 0, 0));
   // curl inicial por dedo (flexão = +X local provada)
   const curlInit = [1.6, 1.5, 1.4, 1.1];
   fingers.forEach((chain, i) => {
     if (chain[0].startsWith("thumb")) {
-      deltas.set(chain[0], new THREE.Euler(0.2 * FLEX_SIGN.R, 0.6 * FLEX_SIGN.R, 0.5 * FLEX_SIGN.R));
-      deltas.set(chain[1], new THREE.Euler(0.1 * FLEX_SIGN.R, 0.3 * FLEX_SIGN.R, 0.2 * FLEX_SIGN.R));
+      deltas.set(
+        chain[0],
+        new THREE.Euler(0.2 * FLEX_SIGN.R, 0.6 * FLEX_SIGN.R, 0.5 * FLEX_SIGN.R),
+      );
+      deltas.set(
+        chain[1],
+        new THREE.Euler(0.1 * FLEX_SIGN.R, 0.3 * FLEX_SIGN.R, 0.2 * FLEX_SIGN.R),
+      );
       deltas.set(chain[2], new THREE.Euler(0, 0, 0));
     } else {
       deltas.set(chain[0], new THREE.Euler(curlInit[i] * FLEX_SIGN.R, 0, 0));
@@ -381,11 +445,11 @@ function solveR(ev: ArmEval, f: Frame, wrapDir: 1 | -1) {
 interface LPlan {
   geom: GripGeom;
   handLTarget: THREE.Vector3;
-  fingerDir: THREE.Vector3;     // tangente (+Y local) alvo
-  radialWrist: THREE.Vector3;   // radial do eixo para o punho alvo
-  tipsTheta: number[];          // graus, a partir do radial do punho
-  tipsT: number[];              // ao longo do eixo (desde o centro)
-  tipsRadius: number;           // raio do cilindro-alvo das pontas L
+  fingerDir: THREE.Vector3; // tangente (+Y local) alvo
+  radialWrist: THREE.Vector3; // radial do eixo para o punho alvo
+  tipsTheta: number[]; // graus, a partir do radial do punho
+  tipsT: number[]; // ao longo do eixo (desde o centro)
+  tipsRadius: number; // raio do cilindro-alvo das pontas L
   thumbTheta: number;
   thumbT: number;
 }
@@ -394,7 +458,13 @@ function lPlan(weapon: WeaponName, f: Frame): LPlan {
     const hg = HANDGUARD_RIFLE;
     const handLTarget = new THREE.Vector3(-0.028, 0.048, -0.03);
     const d = handLTarget.clone().sub(new THREE.Vector3(...hg.center));
-    const radialWrist = d.clone().addScaledVector(new THREE.Vector3(...hg.axis).normalize(), -d.dot(new THREE.Vector3(...hg.axis).normalize())).normalize();
+    const radialWrist = d
+      .clone()
+      .addScaledVector(
+        new THREE.Vector3(...hg.axis).normalize(),
+        -d.dot(new THREE.Vector3(...hg.axis).normalize()),
+      )
+      .normalize();
     return {
       geom: hg,
       handLTarget,
@@ -408,10 +478,7 @@ function lPlan(weapon: WeaponName, f: Frame): LPlan {
     };
   }
   const uL = new THREE.Vector3(-0.55, -0.35, -0.76).normalize();
-  const handLTarget = f.center
-    .clone()
-    .addScaledVector(f.axis, -0.02)
-    .addScaledVector(uL, 0.05);
+  const handLTarget = f.center.clone().addScaledVector(f.axis, -0.02).addScaledVector(uL, 0.05);
   return {
     geom: { ...f, wrapRadius: f.wrapRadius },
     handLTarget,
@@ -467,7 +534,10 @@ function solveL(ev: ArmEval, f: Frame, rDeltas: Map<string, THREE.Euler>, wrapDi
   ev.posDelta.set("hand.L.control", pLocal.clone().sub(ev.restPos.get("hand.L.control")!));
   ev.setPositions(ev.posDelta);
   // hand.L: orientação analítica (palma ao cilindro, dedos na tangente)
-  deltas.set("hand.L", eulerForWorldQuat(ev, "hand.L", handWorldQuat(plan.fingerDir, uW.clone().negate(), -1)));
+  deltas.set(
+    "hand.L",
+    eulerForWorldQuat(ev, "hand.L", handWorldQuat(plan.fingerDir, uW.clone().negate(), -1)),
+  );
   for (const b of palmBones) deltas.set(b, new THREE.Euler(0, 0, 0));
   const curlInitL = [1.5, 1.4, 1.3, 1.0];
   fingers.forEach((ch, i) => {
@@ -496,7 +566,9 @@ function solveL(ev: ArmEval, f: Frame, rDeltas: Map<string, THREE.Euler>, wrapDi
       const pp = ev.byOrig.get("palm_pinky.L")!.getWorldPosition(new THREE.Vector3());
       return new THREE.Vector3().crossVectors(pi.clone().sub(wp), pp.clone().sub(wp)).normalize();
     })();
-    const closest = geomCenter.clone().addScaledVector(geomAxis, m.handL.clone().sub(geomCenter).dot(geomAxis));
+    const closest = geomCenter
+      .clone()
+      .addScaledVector(geomAxis, m.handL.clone().sub(geomCenter).dot(geomAxis));
     const radialNow = m.handL.clone().sub(closest).normalize();
     const nl = nL.dot(radialNow);
     if (nl > -0.6) c += (nl + 0.6) ** 2 * 20;
@@ -545,8 +617,13 @@ function main(): void {
         const d = m.tipsR[n].clone().sub(f.center);
         return d.clone().addScaledVector(f.axis, -d.dot(f.axis)).length();
       });
-      console.log(`wrapDir=${wrapDir}: custo=${r.cost.toFixed(3)} perp máx=${Math.max(...perps).toFixed(4)}`);
-      if (!bestR || r.cost < bestR.cost) { bestR = r; bestDir = wrapDir; }
+      console.log(
+        `wrapDir=${wrapDir}: custo=${r.cost.toFixed(3)} perp máx=${Math.max(...perps).toFixed(4)}`,
+      );
+      if (!bestR || r.cost < bestR.cost) {
+        bestR = r;
+        bestDir = wrapDir;
+      }
     }
     console.log(`→ wrapDir escolhido: ${bestDir} (custo ${bestR!.cost.toFixed(3)})`);
 
@@ -560,19 +637,31 @@ function main(): void {
     for (const [n, p] of Object.entries(m.tipsR)) {
       const d = p.clone().sub(f.center);
       const perp = d.clone().addScaledVector(f.axis, -d.dot(f.axis)).length();
-      console.log(`  ${n.padEnd(14)} d_âncora=${p.distanceTo(f.anchor).toFixed(4)} perp_eixo=${perp.toFixed(4)}`);
+      console.log(
+        `  ${n.padEnd(14)} d_âncora=${p.distanceTo(f.anchor).toFixed(4)} perp_eixo=${perp.toFixed(4)}`,
+      );
     }
     const nu = m.palmNormalR.dot(f.u);
-    console.log(`  palma: dot(n,radial)=${nu.toFixed(2)} |n.z|=${Math.abs(m.palmNormalR.z).toFixed(2)} foreGap=${m.foreGap.toFixed(4)}`);
-    console.log(`  handL: (${m.handL.x.toFixed(4)},${m.handL.y.toFixed(4)},${m.handL.z.toFixed(4)})`);
-    for (const [n, p] of Object.entries(m.tipsL)) console.log(`  ${n.padEnd(14)} (${p.x.toFixed(4)},${p.y.toFixed(4)},${p.z.toFixed(4)})`);
+    console.log(
+      `  palma: dot(n,radial)=${nu.toFixed(2)} |n.z|=${Math.abs(m.palmNormalR.z).toFixed(2)} foreGap=${m.foreGap.toFixed(4)}`,
+    );
+    console.log(
+      `  handL: (${m.handL.x.toFixed(4)},${m.handL.y.toFixed(4)},${m.handL.z.toFixed(4)})`,
+    );
+    for (const [n, p] of Object.entries(m.tipsL))
+      console.log(`  ${n.padEnd(14)} (${p.x.toFixed(4)},${p.y.toFixed(4)},${p.z.toFixed(4)})`);
 
     // ---- emitir package ----
-    const bones: Record<string, { rot?: [number, number, number, number]; pos?: [number, number, number] }> = {};
+    const bones: Record<
+      string,
+      { rot?: [number, number, number, number]; pos?: [number, number, number] }
+    > = {};
     for (const [name] of allDeltas) {
       const node = ev.byOrig.get(name)!;
       node.quaternion.normalize();
-      bones[name] = { rot: [node.quaternion.x, node.quaternion.y, node.quaternion.z, node.quaternion.w] };
+      bones[name] = {
+        rot: [node.quaternion.x, node.quaternion.y, node.quaternion.z, node.quaternion.w],
+      };
     }
     ev.setPositions(ev.posDelta);
     for (const [name, v] of ev.posDelta) {
@@ -581,7 +670,8 @@ function main(): void {
     }
     const pkg = {
       weapon,
-      source: "prd-proj1-assets/inputs/models/viewmodel_arms.glb (rest) — solver M2 v2, espaço R, geometria medida (grip.ts)",
+      source:
+        "prd-proj1-assets/inputs/models/viewmodel_arms.glb (rest) — solver M2 v2, espaço R, geometria medida (grip.ts)",
       bones,
       renames: { "hand.R": "handR", "hand.L": "handL" },
       notes: `M2 v2: init analítica do frame medido (dedos tangentes ao eixo, palma ao eixo; convenção provada R+X/L−X); alvos na superfície do cilindro; wrapDir=${bestDir}; regularizador de descanso 0.02 + barreira de limites.`,

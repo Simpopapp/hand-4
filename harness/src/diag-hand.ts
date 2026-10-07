@@ -13,13 +13,21 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const armsBuf = fs.readFileSync(path.join(ROOT, "prd-proj1-assets/inputs/models/viewmodel_arms.glb"));
-const armsGlb = parseGlb(armsBuf.buffer.slice(armsBuf.byteOffset, armsBuf.byteOffset + armsBuf.byteLength) as ArrayBuffer);
+const armsBuf = fs.readFileSync(
+  path.join(ROOT, "prd-proj1-assets/inputs/models/viewmodel_arms.glb"),
+);
+const armsGlb = parseGlb(
+  armsBuf.buffer.slice(armsBuf.byteOffset, armsBuf.byteOffset + armsBuf.byteLength) as ArrayBuffer,
+);
 const armsRest = buildNodeTree(armsGlb);
 
 function rig(weapon: WeaponName) {
-  const buf = fs.readFileSync(path.join(ROOT, `prd-proj1-assets/inputs/models/viewmodel_${weapon}.glb`));
-  const glb = parseGlb(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer);
+  const buf = fs.readFileSync(
+    path.join(ROOT, `prd-proj1-assets/inputs/models/viewmodel_${weapon}.glb`),
+  );
+  const glb = parseGlb(
+    buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer,
+  );
   const tree = buildNodeTree(glb);
   const rawBox = sceneBoundingBox(glb, tree);
   const r = buildWeaponRig(weapon, tree, rawBox);
@@ -60,12 +68,24 @@ function show(weapon: WeaponName, label: string, deltas: Map<string, THREE.Euler
   const { tips, handR, frame, ok } = evaluate(weapon, deltas);
   const anchor = WEAPONS[weapon].armsHandR as [number, number, number];
   console.log(`\n== ${weapon} ${label} (ok=${ok}) ==`);
-  console.log(`handR no holder: (${handR.x.toFixed(4)},${handR.y.toFixed(4)},${handR.z.toFixed(4)})`);
-  console.log(`frame handR: X=(${frame.X.toArray().map((v) => v.toFixed(2)).join(",")}) Y=(${frame.Y.toArray().map((v) => v.toFixed(2)).join(",")}) Z=(${frame.Z.toArray().map((v) => v.toFixed(2)).join(",")})`);
+  console.log(
+    `handR no holder: (${handR.x.toFixed(4)},${handR.y.toFixed(4)},${handR.z.toFixed(4)})`,
+  );
+  console.log(
+    `frame handR: X=(${frame.X.toArray()
+      .map((v) => v.toFixed(2))
+      .join(",")}) Y=(${frame.Y.toArray()
+      .map((v) => v.toFixed(2))
+      .join(",")}) Z=(${frame.Z.toArray()
+      .map((v) => v.toFixed(2))
+      .join(",")})`,
+  );
   for (const t of TIPS) {
     const dA = tips[t].distanceTo(new THREE.Vector3(...anchor));
     const rel = tips[t].clone().sub(handR);
-    console.log(`${t.padEnd(14)} d_âncora=${dA.toFixed(4)} rel_handR=(${rel.x.toFixed(3)},${rel.y.toFixed(3)},${rel.z.toFixed(3)})`);
+    console.log(
+      `${t.padEnd(14)} d_âncora=${dA.toFixed(4)} rel_handR=(${rel.x.toFixed(3)},${rel.y.toFixed(3)},${rel.z.toFixed(3)})`,
+    );
   }
 }
 
@@ -75,11 +95,18 @@ function main() {
   show(weapon, "descanso (sem delta)", rest);
 
   // varredura: rotação do hand.R em torno dos eixos do frame local
-  const X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0, 1, 0), Z = new THREE.Vector3(0, 0, 1);
+  const X = new THREE.Vector3(1, 0, 0),
+    Y = new THREE.Vector3(0, 1, 0),
+    Z = new THREE.Vector3(0, 0, 1);
   const anchor = new THREE.Vector3(...(WEAPONS[weapon].armsHandR as [number, number, number]));
   console.log("\n-- varredura hand.R (só ele) → dist máx/min das pontas à âncora --");
-  for (const [axisName, axis] of [["X", X], ["Y", Y], ["Z", Z]] as const) {
-    let best = Infinity, bestAng = 0;
+  for (const [axisName, axis] of [
+    ["X", X],
+    ["Y", Y],
+    ["Z", Z],
+  ] as const) {
+    let best = Infinity,
+      bestAng = 0;
     for (let deg = 0; deg <= 360; deg += 15) {
       const d = new Map<string, THREE.Euler>([["hand.R", new THREE.Euler()]]);
       // rotação sobre eixo global aproximada por euler ZYX? usa quaternion direto:
@@ -95,7 +122,10 @@ function main() {
       d.set("hand.R", eu);
       const { tips } = evaluate(weapon, d);
       const maxd = Math.max(...TIPS.map((t) => tips[t].distanceTo(anchor)));
-      if (maxd < best) { best = maxd; bestAng = deg; }
+      if (maxd < best) {
+        best = maxd;
+        bestAng = deg;
+      }
     }
     console.log(`eixo ${axisName}: melhor d_max=${best.toFixed(4)} @ ${bestAng}°`);
   }
@@ -112,10 +142,14 @@ function main() {
 }
 
 const FINGERS = [
-  "f_index.01.R", "f_index.02.R",
-  "f_middle.01.R", "f_middle.02.R",
-  "f_ring.01.R", "f_ring.02.R",
-  "f_pinky.01.R", "f_pinky.02.R",
+  "f_index.01.R",
+  "f_index.02.R",
+  "f_middle.01.R",
+  "f_middle.02.R",
+  "f_ring.01.R",
+  "f_ring.02.R",
+  "f_pinky.01.R",
+  "f_pinky.02.R",
 ];
 
 main();

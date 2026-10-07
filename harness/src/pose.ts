@@ -83,7 +83,8 @@ export function validatePoseSchema(raw: unknown): ValidationError[] {
           Array.isArray(s["pos"]) &&
           (s["pos"] as unknown[]).length === 3 &&
           (s["pos"] as unknown[]).every((v) => typeof v === "number" && Number.isFinite(v));
-        if (!ok) errors.push({ field: `bones.${bone}.pos`, problem: "pos [x,y,z] numérico obrigatório" });
+        if (!ok)
+          errors.push({ field: `bones.${bone}.pos`, problem: "pos [x,y,z] numérico obrigatório" });
       }
       if (s["rot"] === undefined && s["euler"] === undefined && s["pos"] === undefined)
         errors.push({ field: `bones.${bone}`, problem: "nem rot nem euler nem pos" });

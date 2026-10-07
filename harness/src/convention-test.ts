@@ -8,21 +8,34 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseGlb, buildNodeTree, sceneBoundingBox } from "./glb";
-import { WEAPONS, buildWeaponRig, attachArms, applyRenames, REQUIRED_RENAMES, type WeaponName } from "./normalize";
+import {
+  WEAPONS,
+  buildWeaponRig,
+  attachArms,
+  applyRenames,
+  REQUIRED_RENAMES,
+  type WeaponName,
+} from "./normalize";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const ARMS_GLB = path.join(ROOT, "prd-proj1-assets/inputs/models/viewmodel_arms.glb");
 
 function loadArms(): ReturnType<typeof buildNodeTree> {
   const buf = fs.readFileSync(ARMS_GLB);
-  const glb = parseGlb(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer);
+  const glb = parseGlb(
+    buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer,
+  );
   return buildNodeTree(glb);
 }
 
 /** rig do jogo com a árvore de braços dada (rotações já aplicadas ou não). */
 function buildRig(weapon: WeaponName, arms: ReturnType<typeof buildNodeTree>) {
-  const wBuf = fs.readFileSync(path.join(ROOT, `prd-proj1-assets/inputs/models/viewmodel_${weapon}.glb`));
-  const wGlb = parseGlb(wBuf.buffer.slice(wBuf.byteOffset, wBuf.byteOffset + wBuf.byteLength) as ArrayBuffer);
+  const wBuf = fs.readFileSync(
+    path.join(ROOT, `prd-proj1-assets/inputs/models/viewmodel_${weapon}.glb`),
+  );
+  const wGlb = parseGlb(
+    wBuf.buffer.slice(wBuf.byteOffset, wBuf.byteOffset + wBuf.byteLength) as ArrayBuffer,
+  );
   const wTree = buildNodeTree(wGlb);
   const rawBox = sceneBoundingBox(wGlb, wTree);
   const rig = buildWeaponRig(weapon, wTree, rawBox);
@@ -58,11 +71,21 @@ function metrics(weapon: WeaponName, deltas: Map<string, THREE.Euler>) {
 function main() {
   const weapon: WeaponName = "rifle";
   const base = metrics(weapon, new Map());
-  console.log(`n_rest (holder) = (${base.n.x.toFixed(3)},${base.n.y.toFixed(3)},${base.n.z.toFixed(3)})`);
+  console.log(
+    `n_rest (holder) = (${base.n.x.toFixed(3)},${base.n.y.toFixed(3)},${base.n.z.toFixed(3)})`,
+  );
   const Y = new THREE.Vector3(0, 1, 0).applyQuaternion(base.q);
   const Z = new THREE.Vector3(0, 0, 1).applyQuaternion(base.q);
-  console.log(`handR frame: +Y=(${Y.toArray().map((v) => v.toFixed(2)).join(",")}) +Z=(${Z.toArray().map((v) => v.toFixed(2)).join(",")})`);
-  console.log(`dot(n,+Z_local)=${base.n.dot(Z).toFixed(3)}  dot(n,+Y_local)=${base.n.dot(Y).toFixed(3)}`);
+  console.log(
+    `handR frame: +Y=(${Y.toArray()
+      .map((v) => v.toFixed(2))
+      .join(",")}) +Z=(${Z.toArray()
+      .map((v) => v.toFixed(2))
+      .join(",")})`,
+  );
+  console.log(
+    `dot(n,+Z_local)=${base.n.dot(Z).toFixed(3)}  dot(n,+Y_local)=${base.n.dot(Y).toFixed(3)}`,
+  );
 
   for (const sign of [1, -1] as const) {
     const d = new Map<string, THREE.Euler>([["f_middle.01.L", new THREE.Euler(sign * 0.8, 0, 0)]]);
