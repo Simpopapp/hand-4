@@ -671,10 +671,10 @@ function main(): void {
     const pkg = {
       weapon,
       source:
-        "prd-proj1-assets/inputs/models/viewmodel_arms.glb (rest) — solver M2 v2, espaço R, geometria medida (grip.ts)",
+        "prd-proj1-assets/inputs/models/viewmodel_arms.glb (rest) — solver M2 v3, espaço R, geometria medida (grip.ts)",
       bones,
       renames: { "hand.R": "handR", "hand.L": "handL" },
-      notes: `M2 v2: init analítica do frame medido (dedos tangentes ao eixo, palma ao eixo; convenção provada R+X/L−X); alvos na superfície do cilindro; wrapDir=${bestDir}; regularizador de descanso 0.02 + barreira de limites.`,
+      notes: `M2 v3: init analítica do frame medido (dedos tangentes ao eixo, palma ao eixo; convenção provada R+X/L−X); alvos na superfície do cilindro; wrapDir=${bestDir}; clamp duro de limites (margem 0,5°); peso da regra de wrap 4000 + polimento só-regras; margens de palma nu≤−0.63/|n.z|≤0.74.`,
     };
     const out = path.join(ROOT, "poses", `pose_${weapon}.json`);
     fs.mkdirSync(path.dirname(out), { recursive: true });
