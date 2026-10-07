@@ -1,0 +1,112 @@
+{
+  "poseFile": "harness/fixtures/invalid_schema.json",
+  "weapon": "rifle",
+  "verdict": "FAIL",
+  "results": [
+    {
+      "id": "pose_schema_valid",
+      "category": "input_typing",
+      "status": "FAIL",
+      "detail": "bones: objeto obrigatório (nome→rot/euler)"
+    },
+    {
+      "id": "glb_integrity",
+      "category": "structural",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "unique_node_names",
+      "category": "structural",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "handR_node_present",
+      "category": "structural",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "skin_preserved",
+      "category": "structural",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "no_extra_primitives",
+      "category": "structural",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "root_identity",
+      "category": "technical",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "rotation_only_changes",
+      "category": "technical",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "rest_identity_preserved",
+      "category": "technical",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "joint_limits",
+      "category": "continuity",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "chain_continuity",
+      "category": "continuity",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "handR_anchor",
+      "category": "visual",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "fingers_wrap_grip",
+      "category": "visual",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "forearm_separation",
+      "category": "visual",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "palm_not_facing_camera",
+      "category": "visual",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "weapon_scale_formula",
+      "category": "mathematical",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    },
+    {
+      "id": "matrix_recheck",
+      "category": "mathematical",
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
+    }
+  ],
+  "unverifiedCount": 16,
+  "failCount": 1,
+  "passCount": 0
+}

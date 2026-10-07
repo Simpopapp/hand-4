@@ -1,0 +1,144 @@
+# requirements.yaml — regras objetivas do verificador (M1, emendado em M2)
+# Fontes: project1.md (8 checagens) + prd-project1.md + contract.json + medidas.
+# Toda pose do pacote v4 é avaliada contra ESTAS regras. UNVERIFIED != PASS.
+#
+# EMENDA M2 (D7 — causa raiz medida, 2026-10-07):
+# As regras visuais da M1 eram proxies ao redor da ÂNCORA do punho. Medidas
+# dos GLBs reais (measure2/measure3, paridade M1) provaram que o proxy é
+# insatisfazível e frouxo:
+#  - pistola: o vértice mais próximo do grip está a 0.048m da âncora
+#    (0,-0.065,0.035) — NENHUM wrap físico coloca pontas a ≤0.045m da âncora.
+#  - rifle: o raio 0.055m ao redor da âncora permite pontas flutuando fora do
+#    grip (a âncora fica 0.051m fora do eixo do grip).
+# Nova regra: distância PERPENDICULAR das pontas ao EIXO do grip (geometria
+# medida, seção gripGeometry), dentro da extensão do grip. E a regra da palma
+# passou a exigir alinhamento radial (palma encosta no grip) além do teto de
+# câmera. Os fixtures inválidos da M1 continuam REPROVADOS (rest_pose: pontas
+# a ~0.16m do eixo; crossed: regra de antebraço inalterada; renames/schema:
+# regras estruturais inalteradas).
+
+version: 2
+weapons: [rifle, pistol]
+
+tolerances:
+  position: 0.002          # metros, espaço do holder
+  quaternionNormalized: 1.0e-4
+  angleDeg: 180.0          # limite genérico por junta (ver jointLimits)
+  matrixEps: 1.0e-9
+
+# Limite de ângulo por classe de bone (checar continuidade) — desvio máximo
+# da rotação de descanso, em graus. Rest = T-pose rigify.
+jointLimits:
+  finger: 100
+  thumb: 90
+  forearm: 140
+  upper_arm: 120
+  deltoid: 60
+  clavicle: 30
+  hand: 180            # punho pode girar bastante no grip (M2: rotação real ~150°+)
+  default: 45
+
+# Regras por categoria (project1.md), executadas nesta ordem.
+checks:
+  # --- testes estruturais ---
+  - id: glb_integrity
+    category: structural
+    desc: "GLB parseia; chunks JSON+BIN íntegros; accessors/byteViews consistentes"
+  - id: unique_node_names
+    category: structural
+    desc: "nomes de nós únicos no bake (sem duplicidade pós-rename)"
+  - id: handR_node_present
+    category: structural
+    desc: "existe nó nomeado EXATAMENTE 'handR' (jogo: getObjectByName('handR'), VM:278)"
+  - id: skin_preserved
+    category: structural
+    desc: "skin intacta: 50 joints, mesma lista de joints do GLB fonte; mesh/accessor counts inalterados"
+  - id: no_extra_primitives
+    category: structural
+    desc: "nenhuma primitiva nova (ex.: mãos em caixa); meshCount igual ao fonte"
+
+  # --- tipagem de entrada ---
+  - id: pose_schema_valid
+    category: input_typing
+    desc: "pacote de pose valida o schema estrito (quaternion normalizado, campos permitidos)"
+
+  # --- validação da spec ---
+  - id: requirements_covered
+    category: spec_validation
+    desc: "pacote declara weapon conhecido e renames obrigatórios presentes (hand.R→handR, hand.L→handL)"
+
+  # --- checagem técnica ---
+  - id: root_identity
+    category: technical
+    desc: "root do bake em identidade (posição/escala/rotação), pose congelada nos bones"
+  - id: rotation_only_changes
+    category: technical
+    desc: "nenhuma translação/escala de bone alterada (apenas rotação); renames não mudam TRS"
+  - id: rest_identity_preserved
+    category: technical
+    desc: "bones não citados no pacote mantêm a rotação de descanso do GLB fonte (chaves resolvidas pelos renames declarados)"
+
+  # --- checar continuidade ---
+  - id: joint_limits
+    category: continuity
+    desc: "desvio de rotação por bone ≤ jointLimits da sua classe (graus)"
+  - id: chain_continuity
+    category: continuity
+    desc: "juntas conectadas mantêm comprimento de osso (pais→filhos): distância == descanso dentro de tolerância"
+
+  # --- checar visual (proxies matemáticos, espaço do holder; câmera olha −Z da origem) ---
+  - id: handR_anchor
+    category: visual
+    desc: "após pipeline do jogo, handR cai em cfg.arms.handR dentro de tolerância"
+  - id: fingers_wrap_grip
+    category: visual
+    desc: "pontas dos dedos R dentro do raio do EIXO do grip (wrapRadius) e dentro da extensão do grip + margem (geometria medida, gripGeometry)"
+  - id: forearm_separation
+    category: visual
+    desc: "antebraços L/R não cruzados: distância mínima entre segmentos ≥ minForearmGap"
+  - id: palm_not_facing_camera
+    category: visual
+    desc: "palma não encara a câmera (|n.z| ≤ maxPalmFacing) E palma encosta no grip: cross(palmIndex−punho, palmPinky−punho) aponta para o eixo do grip (dot ≥ minPalmRadial)"
+
+  # --- testes matemáticos ---
+  - id: weapon_scale_formula
+    category: mathematical
+    desc: "escala da arma == cfg.length / max(bbox.x, bbox.z) do GLB cru (VM:159-168)"
+  - id: matrix_recheck
+    category: mathematical
+    desc: "world position de handR recalculada por multiplicação manual de mat4 == three.js (eps)"
+
+# Geometria do grip MEDIDA (measure2/measure3, 2026-10-07) — espaço do holder.
+gripGeometry:
+  rifle:
+    center: [-0.0010, -0.0578, 0.1714]
+    axis: [0.121, -0.867, 0.484]     # normalizado na execução
+    radius: 0.0302                    # raio p50 perpendicular ao eixo
+    halfExt: 0.030                    # meia-extensão ao longo do eixo
+  pistol:
+    center: [-0.0400, -0.0569, -0.0024]
+    axis: [-0.078, -0.997, -0.025]
+    radius: 0.0187
+    halfExt: 0.026
+
+# Constantes das regras visuais (espaço do holder, metros).
+visual:
+  # Geometria medida dos grips (M2, harness/src/grip.ts — medir antes de posar)
+  gripGeometry:
+    rifle:
+      center: [-0.001, -0.0578, 0.1714]
+      axis: [0.121, -0.867, 0.484]
+      radius: 0.0302
+      halfExt: 0.03
+    pistol:
+      center: [-0.04, -0.0569, -0.0024]
+      axis: [-0.078, -0.997, -0.025]
+      radius: 0.0187
+      halfExt: 0.026
+  wrapRadius:
+    rifle: 0.045   # raio do grip (0.030) + folga para espessura do dedo
+    pistol: 0.035  # raio do grip (0.019) + folga
+  wrapAxisMargin: 0.02   # tolerância além da meia-extensão do grip
+  minForearmGap: 0.012
+  maxPalmFacing: 0.75    # teto de câmera (um wrap real dá |n.z| ≈ 0.45–0.68)
+  minPalmRadial: 0.6     # palma encostada no grip: dot(n, −radial_âncora) ≥ 0.6

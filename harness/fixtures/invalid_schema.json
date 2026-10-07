@@ -1,0 +1,10 @@
+{
+  "weapon": "rifle",
+  "source": "fixture M1: schema inválido",
+  "bones": "oops",
+  "renames": {
+    "hand.R": "handR",
+    "hand.L": "handL"
+  },
+  "notes": "DEVE FALHAR: tipagem de entrada"
+}

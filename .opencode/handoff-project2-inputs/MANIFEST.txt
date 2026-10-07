@@ -1,0 +1,10 @@
+# sha256  bytes  path
+35137a6b9ba3b883cd70a78f08f6fdea65795dc48a1bdaf18a8439a3b0664f00  4255  inputs/game_contract.md
+1079f9490b32ea7aeac8799d6ea7d5d5bcab44524b200c8a0b93d51162f1bff0  891968  inputs/models/viewmodel_arms.glb
+5098829196ef8c9144217623845ded16404b9fa2b3cacecb960f9b87d92f85a2  925808  inputs/models/viewmodel_pistol.glb
+eb5ea58666e0e22f04dc9f26fc8823927bb0a5d64c90e7c291c9b76548edd073  4362468  inputs/models/viewmodel_rifle.glb
+94a992b5ba4a8532ab5a49740e0166b418cd64213a8b2761c2d8cb92cef31e04  5455  inputs/src/AssetLoader.ts
+b902ba3783b97ed1f02dd1d5e217cfe66ab056f8857a0731046a717acbcfae4c  13766  inputs/src/Engine.ts
+4ddc802ddd3dacd65abf460393a8e9b735ae9f9a27a03a6efdcddbc453f1f00f  16155  inputs/src/ViewmodelV2.ts
+d5e3d70b0b2428c6764787c23b6c848edcf44424f49aa4bea4cfdbaaaf8ef975  2307  inputs/src/viewmodelAssets.ts
+2a091591f6558cac0d3ca12a06aae3b507b0d42501db787bf5e6e18acddf072c  1941  inputs/src/weapons.ts

@@ -1,0 +1,10 @@
+{
+  "weapon": "rifle",
+  "source": "fixture M1: descanso T-pose sem pose",
+  "bones": {},
+  "renames": {
+    "hand.R": "handR",
+    "hand.L": "handL"
+  },
+  "notes": "DEVE FALHAR: sem handR, dedos longe do grip"
+}

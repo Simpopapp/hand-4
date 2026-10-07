@@ -1,0 +1,73 @@
+{
+  "project": "PRD-PROJECT2 v4 — mãos FPS (M4A1 + Glock) para Three.js/TypeScript",
+  "updatedAt": "2026-10-07T04:29:57Z",
+  "phase": "M2",
+  "allGatesPassed": false,
+  "phases": {
+    "M0": {
+      "status": "done",
+      "gates": "PASS",
+      "notes": "9/9 hashes ok; asset_inventory.json e contract.json gerados; toolchain sondada (bun 1.3.3, node 22.22, three NÃO instalado, sem package anterior em disco); STATE.json+NOTES.md criados"
+    },
+    "M1": {
+      "status": "done",
+      "gates": "PASS",
+      "notes": "verificador CLI (harness/src/verify.ts) + requirements.yaml (7 categorias) + 5 fixtures inválidas TODAS REPROVADAS com FAIL real (não só UNVERIFIED); paridade arma/braços contra tradução literal de VM:154-182/260-282 (11/11 testes); gates: vitest 12/12, lint OK, tsgo OK, build OK"
+    },
+    "M2": {
+      "status": "not_started",
+      "gates": null
+    },
+    "M3": {
+      "status": "not_started",
+      "gates": null
+    },
+    "M4": {
+      "status": "not_started",
+      "gates": null
+    },
+    "M5": {
+      "status": "not_started",
+      "gates": null
+    }
+  },
+  "decisions": [
+    {
+      "id": "D1",
+      "date": "2026-10-07",
+      "decision": "docs/PRD-PROJECT2-v4.md (autoridade citada) não existe no disco; prd-project1.md (prompt de continuação v4) atua como PRD operacional. Registrado ao project-monitor antes da execução, com confirmação de recebimento.",
+      "impact": "Divergências futuras viram decisions aqui e nota ao monitor."
+    },
+    {
+      "id": "D2",
+      "date": "2026-10-07",
+      "decision": "inputs/ de trabalho = prd-proj1-assets/inputs/ (manifest com 9 arquivos verificados). .opencode/handoff-project2-inputs/ é cópia de leitura.",
+      "impact": "Escrita proibida em ambos; hashes como prova de imutabilidade."
+    },
+    {
+      "id": "D3",
+      "date": "2026-10-07",
+      "decision": "Pacote experimental anterior não existe em disco (sem poses/, anchors.json, rig_report, verify_report). Não há nada a converter por Anexo B ainda; M1 rejeitará as poses antigas apenas se forem recriadas — caso contrário, M1 valida o verificador com fixtures sintéticas ruins deliberadas.",
+      "impact": "Gate M1 adaptado: verificador deve reprovar fixtures inválidas conhecidas."
+    },
+    {
+      "id": "D4",
+      "date": "2026-10-07",
+      "decision": "center da arma calculado por união de bbox LOCAL por mesh × matrixWorld (réplica de Box3.setFromObject); união global × rotação é errada para pistola (rotações locais não comutam). Corrigido em buildWeaponRig e provado no teste de paridade.",
+      "impact": "Verificador usa a mesma semântica do jogo para ancoragem visual."
+    },
+    {
+      "id": "D5",
+      "date": "2026-10-07",
+      "decision": "comparação de quaternions componente a componente (max |Δ|), não angleTo: quaternions do rig não são perfeitamente normalizados e angleTo(x,x) ≈ 5e-4 rad gera falso positivo em rest_identity.",
+      "impact": "Regras rest_identity/root_identity imunes a ruído de normalização."
+    }
+  ],
+  "artifacts": {
+    "asset_inventory.json": "M0",
+    "contract.json": "M0",
+    "STATE.json": "M0",
+    "NOTES.md": "M0"
+  },
+  "unverified": []
+}

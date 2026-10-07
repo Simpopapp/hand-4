@@ -1,0 +1,22 @@
+{
+  "weapon": "pistol",
+  "source": "fixture M1: renames obrigatórios ausentes",
+  "bones": {
+    "upper_arm.R": {
+      "euler": [
+        0,
+        -0.5,
+        0
+      ]
+    },
+    "forearm.R": {
+      "euler": [
+        0,
+        0,
+        0.6
+      ]
+    }
+  },
+  "renames": {},
+  "notes": "DEVE FALHAR: sem renames o jogo não acha handR"
+}

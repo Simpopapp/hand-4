@@ -1,0 +1,39 @@
+{
+  "weapon": "rifle",
+  "source": "fixture M1: antebraços cruzados (defeito do pacote antigo)",
+  "bones": {
+    "upper_arm.L": {
+      "euler": [
+        -1.4,
+        0,
+        0.9
+      ]
+    },
+    "upper_arm.R": {
+      "euler": [
+        -1.4,
+        0,
+        -0.9
+      ]
+    },
+    "forearm.L": {
+      "euler": [
+        -0.4,
+        0,
+        0
+      ]
+    },
+    "forearm.R": {
+      "euler": [
+        0.4,
+        0,
+        0
+      ]
+    }
+  },
+  "renames": {
+    "hand.R": "handR",
+    "hand.L": "handL"
+  },
+  "notes": "DEVE FALHAR: antebraços cruzados (separação 0.0067m < 0.012m) e limite de junta estourado"
+}

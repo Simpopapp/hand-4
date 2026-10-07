@@ -1,0 +1,23 @@
+{
+  "weapon": "rifle",
+  "source": "fixture M1: campos proibidos no bone (translação/escala)",
+  "bones": {
+    "upper_arm.R": {
+      "euler": [
+        0,
+        -0.5,
+        0
+      ],
+      "pos": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "renames": {
+    "hand.R": "handR",
+    "hand.L": "handL"
+  },
+  "notes": "DEVE FALHAR: apenas rotação é permitida"
+}

@@ -1,0 +1,22 @@
+{
+  "generatedIn": "M0",
+  "sourceOfTruth": "prd-proj1-assets/inputs/src (código real, hashes verificados em MANIFEST.txt)",
+  "verifiedLines": {
+    "ViewmodelV2.ts": {
+      "weaponsConfig": { "rifle": { "length": 0.82, "rot": [0, 0, 0], "offset": [0, 0, 0], "hip": [0.22, -0.24, -0.42], "sightTarget": [0, -0.006, -0.26], "armsScale": 0.12, "armsHandR": [0.035, -0.035, 0.125] }, "pistol": { "length": 0.19, "rot": [1.5707963, 1.5707963, 0, "YXZ"], "offset": [0, 0, 0], "hip": [0.19, -0.23, -0.36], "sightTarget": [0, -0.012, -0.22], "armsScale": 0.1, "armsHandR": [0.0, -0.065, 0.035] } },
+      "armsAnchor": "L278: arms.getObjectByName('handR') — nome EXATO 'handR'; se ausente, braços ficam na origem (L279 return)",
+      "hierarchy": "mainCamera → vmCamera(fov 54, near 0.01, far 4, layer 1) → root → holder → (group→model, arms)",
+      "runtimeMods": ["mag: visible=false entre 42–52% da recarga", "bolt/slide: position.z recua até 0.03 no tiro", "troca: root desce 0.32 e inclina 0.65 rad", "recarga: root mergulha 0.13 / rotX -0.5 / rotY +0.2"]
+    }
+  },
+  "hardRequirements": [
+    "Bake de braços DEVE conter um nó nomeado exatamente 'handR' (o GLB cru tem 'hand.R' — renomear no bake). Sem 'handR', getObjectByName falha e os braços ancoram na origem.",
+    "Bakes carregados pelo jogo: /game-assets/models/viewmodel_arms_pose_rifle.glb e viewmodel_arms_pose_pistol.glb (viewmodelAssets.ts:16-17). O fonte sem pose é viewmodel_arms.glb (incluído em inputs/models).",
+    "Nenhuma alteração em inputs/; preservar mesh, skin, pesos e materiais de viewmodel_arms.glb; sem primitivas como mãos.",
+    "Pose congelada nos bones locais do GLB, root em identidade — nenhum IK/animação em runtime.",
+    "Poses autoradas em espaço R (GLB cru da arma) e anexadas à model; conversão Anexo B para herdar pacote H, se aproveitado.",
+    "Pistol GLB não tem nós muzzle/sight (inventário) → jogo usa fallback: muzzle no menor z do bbox; adsPos = (hip.x*0.1, hip.y*0.45, hip.z-0.04).",
+    "Rifle tem nós: Magazine, Parts/Barrel, Parts/Charging_Handle, Parts/Ejector, Parts/Sight (animações de recarga/ferrolho aplicam-se)."
+  ],
+  "inventoryRef": "asset_inventory.json (M0): arms=66 nós/50 joints/8152 tris; pistol=3 nós/30636 tris; rifle=30 nós/13 meshes/9258 tris"
+}
