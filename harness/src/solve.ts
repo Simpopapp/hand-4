@@ -83,11 +83,22 @@ class ArmEval {
     this.ok = attach.ok;
     root.updateMatrixWorld(true);
   }
-  /** regrava TODOS os bones mutados (rest × dq) — mapa completo a cada chamada. */
+  /** regrava TODOS os bones mutados (rest × dq) — mapa completo a cada chamada.
+   *  v3: projeção DURA nos limites com margem de 0,5° — a barreira soft da v2
+   *  deixava juntas no limiar exato (45.0°/100.0°) e o ruído numérico as
+   *  empurrava 0,1–0,2° além do limite do verificador. */
   setDeltas(deltas: Map<string, THREE.Euler>) {
     for (const [name, e] of deltas) {
       const node = this.byOrig.get(name)!;
-      node.quaternion.copy(this.rest.get(name)!).multiply(new THREE.Quaternion().setFromEuler(e));
+      const rest = this.rest.get(name)!;
+      node.quaternion.copy(rest).multiply(new THREE.Quaternion().setFromEuler(e));
+      const lim = limitFor(name) - 0.5 * DEG;
+      const angle = rest.angleTo(node.quaternion);
+      if (angle > lim) {
+        const dq = rest.clone().invert().multiply(node.quaternion);
+        const scaled = new THREE.Quaternion().slerp(dq, lim / angle); // ident → dq
+        node.quaternion.copy(rest).multiply(scaled);
+      }
     }
   }
   setPositions(pos: Map<string, THREE.Vector3>) {
@@ -278,8 +289,11 @@ function cylinderCost(f: Frame, tips: Record<string, THREE.Vector3>, targets: Re
     const d = p.clone().sub(f.center);
     const tA = d.dot(f.axis);
     const perp = d.clone().addScaledVector(f.axis, -tA).length();
-    c += Math.max(0, perp - f.wrapRadius) ** 2 * 400;          // regra: dentro do raio
-    c += Math.max(0, Math.abs(tA) - (f.halfExt + 0.02)) ** 2 * 400; // regra: dentro do grip
+    // v3: peso da regra dura 400→4000 — na v2 o custo de furar o wrap
+    // (≤0.05 por ponta) perdia para a barreira de limites e o regularizador
+    // de descanso; o otimizador estacionava as pontas 1–11 mm fora do grip.
+    c += Math.max(0, perp - f.wrapRadius) ** 2 * 4000;          // regra: dentro do raio
+    c += Math.max(0, Math.abs(tA) - (f.halfExt + 0.02)) ** 2 * 4000; // regra: dentro do grip
     c += (perp - f.radius) ** 2 * wSurf;                        // visual: na superfície
   }
   return c;
