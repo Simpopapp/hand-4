@@ -1,118 +1,112 @@
 {
-  "poseFile": "poses/pose_pistol.json",
-  "weapon": "pistol",
-  "verdict": "PASS",
+  "poseFile": "harness/fixtures/invalid_schema.json",
+  "weapon": "rifle",
+  "verdict": "FAIL",
   "results": [
+    {
+      "id": "pose_schema_valid",
+      "category": "input_typing",
+      "status": "FAIL",
+      "detail": "bones: objeto obrigatório (nome→rot/euler)"
+    },
     {
       "id": "glb_integrity",
       "category": "structural",
-      "status": "PASS",
-      "detail": "GLB íntegro: 49 accessors, 11 bufferViews, 891968B"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "unique_node_names",
       "category": "structural",
-      "status": "PASS",
-      "detail": "66 nós, sem duplicidade"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "handR_node_present",
       "category": "structural",
-      "status": "PASS",
-      "detail": "nó 'handR' presente"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "skin_preserved",
       "category": "structural",
-      "status": "PASS",
-      "detail": "skin intacta: 50 joints"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "no_extra_primitives",
       "category": "structural",
-      "status": "PASS",
-      "detail": "1 primitiva (a malha original)"
-    },
-    {
-      "id": "pose_schema_valid",
-      "category": "input_typing",
-      "status": "PASS",
-      "detail": "schema ok"
-    },
-    {
-      "id": "requirements_covered",
-      "category": "spec_validation",
-      "status": "PASS",
-      "detail": "renames obrigatórios presentes"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "root_identity",
       "category": "technical",
-      "status": "PASS",
-      "detail": "1 nó(s) topo em TRS de descanso"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "rotation_only_changes",
       "category": "technical",
-      "status": "PASS",
-      "detail": "só rotações mudam (TRS preservado nó a nó)"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "rest_identity_preserved",
       "category": "technical",
-      "status": "PASS",
-      "detail": "rest preservado fora do pacote"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "joint_limits",
       "category": "continuity",
-      "status": "PASS",
-      "detail": "41 bones dentro dos limites"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "chain_continuity",
       "category": "continuity",
-      "status": "PASS",
-      "detail": "comprimentos de osso preservados"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "handR_anchor",
       "category": "visual",
-      "status": "PASS",
-      "detail": "handR em (0.0000,-0.0650,0.0350), d=0.00000m"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "fingers_wrap_grip",
       "category": "visual",
-      "status": "PASS",
-      "detail": "5 pontas de dedo no grip (perp ≤ 0.035m, extensão ok)"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "forearm_separation",
       "category": "visual",
-      "status": "PASS",
-      "detail": "antebraços separados: 0.308m"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "palm_not_facing_camera",
       "category": "visual",
-      "status": "PASS",
-      "detail": "palma contra o grip (dot=-0.63) e não encara a câmera (|n.z|=0.14)"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "weapon_scale_formula",
       "category": "mathematical",
-      "status": "PASS",
-      "detail": "escala 0.02148 == length/max(x,z)"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     },
     {
       "id": "matrix_recheck",
       "category": "mathematical",
-      "status": "PASS",
-      "detail": "three.js == mat4 manual (Δ=0.00e+0)"
+      "status": "UNVERIFIED",
+      "detail": "não avaliado: schema inválido"
     }
   ],
-  "unverifiedCount": 0,
-  "failCount": 0,
-  "passCount": 18
+  "unverifiedCount": 16,
+  "failCount": 1,
+  "passCount": 0
 }
